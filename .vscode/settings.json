@@ -1,0 +1,22 @@
+{
+    "files.autoSave": "onFocusChange",
+    "terminal.explorerKind": "external",
+    "editor.fontFamily": "'DejaVu Sans Mono', 'Source Code Pro', Consolas, 'Courier New', monospace",
+    "editor.fontLigatures": true,
+    "autoDocstring.docstringFormat": "google",
+    "autoDocstring.quoteStyle": "'''",
+    "autoDocstring.startOnNewLine": true,
+    "autoDocstring.includeName": true,
+    "autoDocstring.includeExtendedSummary": false,
+    "docwriter.style": "Auto-detect",
+    "terminal.integrated.defaultProfile.windows": "Command Prompt",
+    "terminal.integrated.fontFamily": "monospace",
+    "docwriter.progress.trackFunctions": false,
+    "docwriter.progress.trackMethods": false,
+    "docwriter.progress.trackClasses": true,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "ms-python.autopep8",
+    "python.analysis.typeCheckingMode": "off",
+    "autoDocstring.logLevel": "Debug",
+    "autoDocstring.guessTypes": true
+}
