@@ -1,7 +1,8 @@
 from dataclasses import dataclass
+from bisect import bisect
+
 import numpy as np
 import numpy.typing as npt
-from bisect import bisect
 
 
 @dataclass
@@ -71,7 +72,7 @@ class ArmSelection():
         processed_prob: list[float] = [prob[i] + prob[i-1]
                                        for i in range(1, len(prob))]
         processed_prob.insert(0, prob[0])
-        processed_prob[len(prob)-1] = float('inf'),
+        processed_prob[-1] = float('inf')
         return bisect(processed_prob, ran)
 
 
@@ -106,5 +107,9 @@ class Softmax(ArmSelection):
         self.initialize()
 
     def select_arm(self) -> int:
-        exp_sum = np.sum(np.exp((self.values/self.tau), dtype=np.float64))
-        return -1
+        exp_sum: float = np.sum(np.exp((self.values/self.tau),
+                                       dtype=np.float64), dtype=np.float64)
+        prob_dist = [np.exp(val/self.tau, dtype=np.float64) /
+                     exp_sum for val in self.values]
+        del exp_sum
+        return Softmax.proportional_selection(prob=prob_dist)
