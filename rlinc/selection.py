@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 import numpy as np
+import numpy.typing as npt
+from bisect import bisect
 
 
 @dataclass
@@ -8,20 +10,16 @@ class ArmSelection():
     """A class that is used to select the multiarm bandit arm."""
 
     n_arms: int = 10
-    count: np.ndarray(
-        dtype=np.int32,
-        shape=n_arms) = np.empty(
+    count: npt.NDArray[np.int32] = np.empty(
         dtype=np.int32,
         shape=n_arms)
-    values: np.ndarray(
+    values: npt.NDArray[np.float16] = np.empty(
         dtype=np.float16,
-        shape=n_arms) = np.empty(
-        dtype=np.int32,
         shape=n_arms)
 
     def preffered_arm(self) -> int:
         """Returning the index of the maximum value in the array."""
-        return np.argmax(self.values)
+        return int(np.argmax(self.values))
 
     def choose_arm(self) -> int:
         """Returning the index of the maximum value in the array."""
@@ -41,7 +39,7 @@ class ArmSelection():
             fill_value=high_value,
             dtype=np.float16)
 
-    def update(self, arm: int, reward: float) -> float:
+    def update(self, arm: int, reward: float) -> None:
         """Updating the count and values array."""
         self.count[arm] = self.count[arm] + 1
         count = self.count[arm]
@@ -49,6 +47,32 @@ class ArmSelection():
         new_val = ((count - 1) / float(count)) * \
             old_val + (1 / float(count)) * reward
         self.values[arm] = new_val
+
+    @staticmethod
+    def proportional_selection(prob: list[float]):
+        '''
+        proportional_selection 
+        =====================
+
+        This function takes probability array as input and will output the sample 
+        proportional to the probability
+
+        Param
+        ++++++
+
+        Prob: list[float], e.g. [0.3, 0.4, 0.2, 0.1] here probability of arm 0 is 0.3, arm 1 is 0.4 and so on.
+        convert the np array to prob using ndarray.tolist() option
+
+        Return
+        ------
+        The arm selected randomly from that discrete probability distribution.
+        '''
+        ran: float = np.random.random()
+        processed_prob: list[float] = [prob[i] + prob[i-1]
+                                       for i in range(1, len(prob))]
+        processed_prob.insert(0, prob[0])
+        processed_prob[len(prob)-1] = float('inf'),
+        return bisect(processed_prob, ran)
 
 
 @dataclass
@@ -81,21 +105,6 @@ class Softmax(ArmSelection):
         """this function will run after __init__ autommatically"""
         self.initialize()
 
-    @staticmethod
-    def proportional_selection():
-        '''
-        proportional_selection 
-        ----------------------
-
-        __ summary __
-
-        This function takes probability array as input and will output the sample 
-        proportional to the probability
-        '''
-        ran: float = np.random.random()
-        cum_prob: float = 0.0
-
-        pass
-
     def select_arm(self) -> int:
-        pass
+        exp_sum = np.sum(np.exp((self.values/self.tau), dtype=np.float64))
+        return -1
