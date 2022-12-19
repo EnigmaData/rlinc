@@ -1,6 +1,3 @@
-import selection
-import testing
-
 version = "0.0.101"
 author = {
     "name": "Shubh Agarwal",
