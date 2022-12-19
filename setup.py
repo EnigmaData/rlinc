@@ -5,7 +5,7 @@ HERE = pathlib.Path(__file__).parent
 
 setup(
     name='rlinc',
-    version='0.0.1',
+    version='0.0.101',
     description='A python package for RL bandits, looking forward to expanding it',
     long_description=(HERE / "README.md").read_text(),
     license="MIT",
@@ -13,7 +13,7 @@ setup(
     author_email='shubhag3110@gmail.com',
     install_requires=[
         'numpy>=1.17.0',
-        'wheel'
+        'matplotlib>=3.2.0'
     ],
     packages=find_packages(),
     url='https://github.com/EnigmaData/rlinc/',
