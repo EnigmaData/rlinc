@@ -49,6 +49,16 @@ class ArmSelection():
             old_val + (1 / float(count)) * reward
         self.values[arm] = new_val
 
+    def change_count(self, count: list[int] or npt.NDArray[np.int32], change_arr: bool = False) -> None:
+        if (length := len(count)) != self.n_arms:
+            if change_arr:
+                self.n_arms = length
+        self.count = np.array(count, dtype=np.int32)
+
+    @classmethod
+    def change_count_adv(cls, count: npt.NDArray[np.int32]):
+        pass
+
     @staticmethod
     def proportional_selection(prob: list[float]):
         '''
@@ -113,3 +123,20 @@ class Softmax(ArmSelection):
                      exp_sum for val in self.values]
         del exp_sum
         return Softmax.proportional_selection(prob=prob_dist)
+
+
+@dataclass
+class UCB1(ArmSelection):
+    """It is the implementation of the state of the art UCB algorithm.
+    """
+    beta: float = 0.99
+
+    def select_arm(self) -> int:
+        if (arms := np.sum(self.count)) < self.n_arms:
+            return int(arms)
+
+        confidence_half: npt.NDArray[np.float32] = self.beta * \
+            np.sqrt(arms*np.reciprocal(self.values, dtype=np.float32))
+        ucb_t: npt.NDArray[np.float32] = np.add(
+            self.values, confidence_half, dtype=np.float32)
+        return int(np.argmax(ucb_t))
