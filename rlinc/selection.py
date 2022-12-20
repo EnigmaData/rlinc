@@ -43,8 +43,8 @@ class ArmSelection():
         self.values = np.zeros(shape=self.n_arms, dtype=np.float16)
 
     def optimistic_initialization(self, high_value: float = 1.96) -> None:
-        """Initializing the count array to zero and values array to an optimistic high value.
-        It does in helping initial exploration"""
+        """Initializing the count array to zero and values array to an
+        optimistic high value. It does in helping initial exploration"""
         self.count = np.zeros(shape=self.n_arms, dtype=np.int32)
         self.values = np.full(
             shape=self.n_arms,
@@ -60,7 +60,9 @@ class ArmSelection():
             old_val + (1 / float(count)) * reward
         self.values[arm] = new_val
 
-    def change_count(self, count: list[int] or npt.NDArray[np.int32], new_arr: bool = False) -> None:
+    def change_count(self, count: list[int]
+                     or npt.NDArray[np.int_], new_arr: bool = False) -> None:
+        """It intends to change the count array by name"""
         if (length := len(count)) != self.n_arms:
             if not new_arr:
                 self.n_arms = length
@@ -69,16 +71,17 @@ class ArmSelection():
     @staticmethod
     def proportional_selection(prob: list[float]):
         '''
-        proportional_selection 
+        proportional_selection
         =====================
 
-        This function takes probability array as input and will output the sample 
+        This function takes probability array as input and will output the sample
         proportional to the probability
 
         Param
         -----
 
-        Prob: list[float], e.g. [0.3, 0.4, 0.2, 0.1] here probability of arm 0 is 0.3, arm 1 is 0.4 and so on.
+        Prob: list[float], e.g. [0.3, 0.4, 0.2, 0.1] here probability of arm
+        0 is 0.3, arm 1 is 0.4 and so on.
         convert the np array to prob using ndarray.tolist() option
 
         Return
@@ -86,7 +89,7 @@ class ArmSelection():
         The arm selected randomly from that discrete probability distribution.
         '''
         ran: float = np.random.random()
-        processed_prob: list[float] = [prob[i] + prob[i-1]
+        processed_prob: list[float] = [prob[i] + prob[i - 1]
                                        for i in range(1, len(prob))]
         processed_prob.insert(0, prob[0])
         processed_prob[-1] = float('inf')
@@ -104,6 +107,7 @@ class EpsilonGreedy(ArmSelection):
     epsilon: float = 0.1
 
     def __post_init__(self):
+        """adding for the sake of pylint"""
         self.initialize()
 
     def select_arm(self) -> int:
@@ -112,13 +116,19 @@ class EpsilonGreedy(ArmSelection):
         """
         if np.random.random() > self.epsilon:  # prob is 1-epsilon
             return self.preffered_arm()
-        else:
-            return np.random.randint(low=0, high=len(self.values))
+        return np.random.randint(low=0, high=len(self.values))
 
 
 @dataclass
 class AnnealingEpsilonGreedy(EpsilonGreedy):
-    # Todo: We would need to accept an annuling function and
+
+    """
+    Adding annuling epsilon greedy, we are expecting that it will accept
+    functions as input and reduces the epsilon so as to reduce overexploration
+    after a long time.
+    """
+
+    # We would need to accept an annuling function and
     # change the epsilon accordingly
     pass
 
@@ -135,9 +145,10 @@ class Softmax(ArmSelection):
         self.initialize()
 
     def select_arm(self) -> int:
-        exp_sum: float = np.sum(np.exp((self.values/self.tau),
+        """Selecting the arm with highest exponential proportion"""
+        exp_sum: float = np.sum(np.exp((self.values / self.tau),
                                        dtype=np.float64), dtype=np.float64)
-        prob_dist = [np.exp(val/self.tau, dtype=np.float64) /
+        prob_dist = [np.exp(val / self.tau, dtype=np.float64) /
                      exp_sum for val in self.values]
         del exp_sum
         return Softmax.proportional_selection(prob=prob_dist)
@@ -151,11 +162,12 @@ class UCB1(ArmSelection):
     beta: float = 0.99
 
     def select_arm(self) -> int:
+        """Selecting the arm with highest upper-bound."""
         if (arms := np.sum(self.count)) < self.n_arms:
             return int(arms)
 
         confidence_half: npt.NDArray[np.float32] = self.beta * \
-            np.sqrt(arms*np.reciprocal(self.values, dtype=np.float32))
+            np.sqrt(arms * np.reciprocal(self.values, dtype=np.float32))
         ucb_t: npt.NDArray[np.float32] = np.add(
             self.values, confidence_half, dtype=np.float32)
         return int(np.argmax(ucb_t))

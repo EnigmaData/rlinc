@@ -1,5 +1,6 @@
-from setuptools import setup, find_packages
+"""Setup file for rlinc package, added because of stupid pylint"""
 import pathlib
+from setuptools import setup, find_packages
 
 from rlinc import VERSION, AUTHOR
 

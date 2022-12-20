@@ -22,7 +22,7 @@ ranging from absolute greedy to state of the art UCB algorithm.
 testing
 -------
 
-It is the module concerning with testing the multiarm Bandits. You can 
+It is the module concerning with testing the multiarm Bandits. You can
 modify these to model you problem in a better manner and selecct which
 algorithm is performing good for your problem.
 
