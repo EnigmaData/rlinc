@@ -18,6 +18,17 @@ class ArmSelection():
         dtype=np.float16,
         shape=n_arms)
 
+    @classmethod
+    def from_array(cls, values: list[float] or npt.NDArray[np.float_]):
+        """
+        Alternate constructor for construction from value array.
+        """
+        values_np: npt.NDArray[np.float16] = np.array(values, dtype=np.float16)
+        n_arms = len(values_np)
+        count_np: npt.NDArray[np.int32] = np.zeros(
+            shape=n_arms, dtype=np.int32)
+        return cls(n_arms, count_np, values_np)
+
     def preffered_arm(self) -> int:
         """Returning the index of the maximum value in the array."""
         return int(np.argmax(self.values))
@@ -49,15 +60,11 @@ class ArmSelection():
             old_val + (1 / float(count)) * reward
         self.values[arm] = new_val
 
-    def change_count(self, count: list[int] or npt.NDArray[np.int32], change_arr: bool = False) -> None:
+    def change_count(self, count: list[int] or npt.NDArray[np.int32], new_arr: bool = False) -> None:
         if (length := len(count)) != self.n_arms:
-            if change_arr:
+            if not new_arr:
                 self.n_arms = length
         self.count = np.array(count, dtype=np.int32)
-
-    @classmethod
-    def change_count_adv(cls, count: npt.NDArray[np.int32]):
-        pass
 
     @staticmethod
     def proportional_selection(prob: list[float]):
@@ -69,7 +76,7 @@ class ArmSelection():
         proportional to the probability
 
         Param
-        ++++++
+        -----
 
         Prob: list[float], e.g. [0.3, 0.4, 0.2, 0.1] here probability of arm 0 is 0.3, arm 1 is 0.4 and so on.
         convert the np array to prob using ndarray.tolist() option
@@ -109,7 +116,13 @@ class EpsilonGreedy(ArmSelection):
 
 
 @dataclass
+class AnnealingEpsilonGreedy(EpsilonGreedy):
+    pass
+
+
+@dataclass
 class Softmax(ArmSelection):
+    """Softmax algorithm implementation"""
     tau: float = 0.1
 
     def __post_init__(self):

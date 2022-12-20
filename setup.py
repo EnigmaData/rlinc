@@ -1,16 +1,18 @@
 from setuptools import setup, find_packages
 import pathlib
 
+from rlinc import VERSION, AUTHOR
+
 HERE = pathlib.Path(__file__).parent
 
 setup(
     name='rlinc',
-    version='0.0.101',
+    version=VERSION,
     description='A python package for RL bandits, looking forward to expanding it',
     long_description=(HERE / "README.md").read_text(),
     license="MIT",
-    author='Shubh Agarwal',
-    author_email='shubhag3110@gmail.com',
+    author=AUTHOR['name'],
+    author_email=AUTHOR['email'],
     install_requires=[
         'numpy>=1.17.0',
         'matplotlib>=3.2.0'
