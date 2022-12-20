@@ -10,4 +10,3 @@ class DistributionArm():
     """This will work as parent class from which all the other
     distribution arm will emerge from.
     """
-    pass
