@@ -100,6 +100,7 @@ class EpsilonGreedy(ArmSelection):
     If a random number is greater than epsilon, then return the preffered arm, otherwise return a
     random arm. The Select arm function is different from the Arm Selection here
     """
+
     epsilon: float = 0.1
 
     def __post_init__(self):
@@ -117,12 +118,16 @@ class EpsilonGreedy(ArmSelection):
 
 @dataclass
 class AnnealingEpsilonGreedy(EpsilonGreedy):
+    # Todo: We would need to accept an annuling function and
+    # change the epsilon accordingly
     pass
 
 
 @dataclass
 class Softmax(ArmSelection):
+
     """Softmax algorithm implementation"""
+
     tau: float = 0.1
 
     def __post_init__(self):
@@ -140,8 +145,9 @@ class Softmax(ArmSelection):
 
 @dataclass
 class UCB1(ArmSelection):
-    """It is the implementation of the state of the art UCB algorithm.
-    """
+
+    """It is the implementation of the state of the art UCB algorithm."""
+
     beta: float = 0.99
 
     def select_arm(self) -> int:
