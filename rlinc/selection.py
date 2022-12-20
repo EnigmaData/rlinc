@@ -1,3 +1,7 @@
+"""
+This modules has all the algorithms related to the multiarm bandit problems
+ranging from absolute greedy to state of the art UCB algorithm.
+"""
 from dataclasses import dataclass
 from bisect import bisect
 
@@ -130,7 +134,6 @@ class AnnealingEpsilonGreedy(EpsilonGreedy):
 
     # We would need to accept an annuling function and
     # change the epsilon accordingly
-    pass
 
 
 @dataclass
