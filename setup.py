@@ -30,5 +30,5 @@ setup(
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
         "Programming Language :: Python :: Implementation :: CPython"
     ],
-    python_requires='>3.9.0'
+    python_requires='>3.10.0'
 )

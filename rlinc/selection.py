@@ -55,18 +55,28 @@ class ArmSelection():
             fill_value=high_value,
             dtype=np.float16)
 
-    def update(self, arm: int, reward: float) -> None:
-        """Updating the count and values array."""
+    def update(self, arm: int, reward: float, alpha: float | object = None) -> None:
+        """Updating the count and values array.
+        You can also provide alpha parameter for non-stationary bandits
+
+        Note-
+        ----
+
+        Provide value of alpha between 0 and 1
+        """
         self.count[arm] = self.count[arm] + 1
         count = self.count[arm]
         old_val = self.values[arm]
-        new_val = ((count - 1) / float(count)) * \
-            old_val + (1 / float(count)) * reward
-        self.values[arm] = new_val
+        if not alpha:
+            new_val = ((count - 1) / float(count)) * \
+                old_val + (1 / float(count)) * reward
+            self.values[arm] = new_val
+        else:
+            self.values[arm] = old_val + alpha*(reward - old_val)
 
     def change_count(self, count: list[int]
                      or npt.NDArray[np.int_], new_arr: bool = False) -> None:
-        """It intends to change the count array by name"""
+        """It intends to change the count array"""
         if (length := len(count)) != self.n_arms:
             if not new_arr:
                 self.n_arms = length

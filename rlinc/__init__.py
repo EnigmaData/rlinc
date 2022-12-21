@@ -28,7 +28,7 @@ algorithm is performing good for your problem.
 
 """
 
-VERSION = "0.0.101"
+VERSION = "0.0.102"
 AUTHOR = {
     "name": "Shubh Agarwal",
     "email": "shubhag3110@gmail.com"
