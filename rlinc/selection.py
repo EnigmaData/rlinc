@@ -4,6 +4,7 @@ ranging from absolute greedy to state of the art UCB algorithm.
 """
 from dataclasses import dataclass
 from bisect import bisect
+from typing import Callable
 
 import numpy as np
 import numpy.typing as npt
@@ -14,13 +15,13 @@ class ArmSelection():
 
     """A class that is used to select the multiarm bandit arm."""
 
-    n_arms: int = 10
+    _n_arms: int = 10
     count: npt.NDArray[np.int32] = np.empty(
         dtype=np.int32,
-        shape=n_arms)
+        shape=_n_arms)
     values: npt.NDArray[np.float16] = np.empty(
         dtype=np.float16,
-        shape=n_arms)
+        shape=_n_arms)
 
     @classmethod
     def from_array(cls, values: list[float] or npt.NDArray[np.float_]):
@@ -28,10 +29,10 @@ class ArmSelection():
         Alternate constructor for construction from value array.
         """
         values_np: npt.NDArray[np.float16] = np.array(values, dtype=np.float16)
-        n_arms = len(values_np)
+        _n_arms = len(values_np)
         count_np: npt.NDArray[np.int32] = np.zeros(
-            shape=n_arms, dtype=np.int32)
-        return cls(n_arms, count_np, values_np)
+            shape=_n_arms, dtype=np.int32)
+        return cls(_n_arms, count_np, values_np)
 
     def preffered_arm(self) -> int:
         """Returning the index of the maximum value in the array."""
@@ -43,15 +44,15 @@ class ArmSelection():
 
     def initialize(self) -> None:
         """Initializing the count and values array to zero."""
-        self.count = np.zeros(shape=self.n_arms, dtype=np.int32)
-        self.values = np.zeros(shape=self.n_arms, dtype=np.float16)
+        self.count = np.zeros(shape=self._n_arms, dtype=np.int32)
+        self.values = np.zeros(shape=self._n_arms, dtype=np.float16)
 
     def optimistic_initialization(self, high_value: float = 1.96) -> None:
         """Initializing the count array to zero and values array to an
         optimistic high value. It does in helping initial exploration"""
-        self.count = np.zeros(shape=self.n_arms, dtype=np.int32)
+        self.count = np.zeros(shape=self._n_arms, dtype=np.int32)
         self.values = np.full(
-            shape=self.n_arms,
+            shape=self._n_arms,
             fill_value=high_value,
             dtype=np.float16)
 
@@ -59,7 +60,7 @@ class ArmSelection():
         """Updating the count and values array.
         You can also provide alpha parameter for non-stationary bandits
 
-        Note-
+        Note -
         ----
 
         Provide value of alpha between 0 and 1
@@ -77,9 +78,9 @@ class ArmSelection():
     def change_count(self, count: list[int]
                      or npt.NDArray[np.int_], new_arr: bool = False) -> None:
         """It intends to change the count array"""
-        if (length := len(count)) != self.n_arms:
+        if (length := len(count)) != self._n_arms:
             if not new_arr:
-                self.n_arms = length
+                self._n_arms = length
         self.count = np.array(count, dtype=np.int32)
 
     @staticmethod
@@ -142,6 +143,11 @@ class AnnealingEpsilonGreedy(EpsilonGreedy):
     after a long time.
     """
 
+    func: Callable[[int], float] = lambda x: 1 - np.sin(x + 3)
+
+    def __post_init__(self):
+        self.epsilon = self.func(0)
+
     # We would need to accept an annuling function and
     # change the epsilon accordingly
 
@@ -176,7 +182,7 @@ class UCB1(ArmSelection):
 
     def select_arm(self) -> int:
         """Selecting the arm with highest upper-bound."""
-        if (arms := np.sum(self.count)) < self.n_arms:
+        if (arms := np.sum(self.count)) < self._n_arms:
             return int(arms)
 
         confidence_half: npt.NDArray[np.float32] = self.beta * \
