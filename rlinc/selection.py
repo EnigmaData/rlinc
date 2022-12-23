@@ -2,8 +2,8 @@
 This modules has all the algorithms related to the multiarm bandit problems
 ranging from absolute greedy to state of the art UCB algorithm.
 """
-from dataclasses import dataclass
 from bisect import bisect
+from dataclasses import dataclass
 from typing import Callable
 
 import numpy as np
@@ -84,7 +84,7 @@ class ArmSelection():
         self.count = np.array(count, dtype=np.int32)
 
     @staticmethod
-    def proportional_selection(prob: list[float]):
+    def proportional_selection(prob: list[float]) -> int:
         '''
         proportional_selection
         =====================
@@ -121,7 +121,7 @@ class EpsilonGreedy(ArmSelection):
 
     epsilon: float = 0.1
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """adding for the sake of pylint"""
         self.initialize()
 
@@ -145,9 +145,18 @@ class AnnealingEpsilonGreedy(EpsilonGreedy):
 
     func: Callable[[int], float] = lambda x: 1 - np.sin(x + 3)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.epsilon = self.func(0)
 
+    def annulator(update_func: Callable):  # type: ignore ## for VS Code py-lance
+        """Decorator to update epsilon after every itteration"""
+
+        def inner_func(self, *args, **kwargs):
+            update_func(args, kwargs)
+            self.epsilon -= self.func(int(np.sum(self.count)))
+        return inner_func
+
+    update = annulator(super().update)
     # We would need to accept an annuling function and
     # change the epsilon accordingly
 
