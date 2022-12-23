@@ -28,7 +28,9 @@ algorithm is performing good for your problem.
 
 """
 
-VERSION = "0.0.102"
+import rlinc.selection as selection
+
+VERSION = "0.0.102dev"
 AUTHOR = {
     "name": "Shubh Agarwal",
     "email": "shubhag3110@gmail.com"

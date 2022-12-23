@@ -9,6 +9,12 @@ from typing import Callable
 import numpy as np
 import numpy.typing as npt
 
+import logging
+
+logging.basicConfig(filename='example.log',
+                    encoding='utf-8', level=logging.DEBUG)
+# remove this file when merging to main
+
 
 @dataclass
 class ArmSelection():
@@ -143,7 +149,7 @@ class AnnealingEpsilonGreedy(EpsilonGreedy):
     after a long time.
     """
 
-    func: Callable[[int], float] = lambda x: 1 - np.sin(x + 3)
+    func: Callable[[int], float] = lambda x: x/1000000.0
 
     def __post_init__(self) -> None:
         self.epsilon = self.func(0)
@@ -152,11 +158,13 @@ class AnnealingEpsilonGreedy(EpsilonGreedy):
         """Decorator to update epsilon after every itteration"""
 
         def inner_func(self, *args, **kwargs):
+            logging.debug("It is comming here")
             update_func(args, kwargs)
+            logging.debug("It is not comming here ig")
             self.epsilon -= self.func(int(np.sum(self.count)))
         return inner_func
 
-    update = annulator(super().update)
+    update = annulator(ArmSelection.update)
     # We would need to accept an annuling function and
     # change the epsilon accordingly
 
